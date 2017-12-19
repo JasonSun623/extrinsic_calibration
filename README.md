@@ -5,6 +5,9 @@
 This package is for converting the poses of different RGBD cameras into world space. 
 One-shot calibration at its best ;)
 
+### PREREQUISITES
+- OpenCV
+- PCL
 
 ### HOW TO
 This only works with RGBD cameras (must be intrisically calibrated first!). All the cameras have to see the full calibration board. 
