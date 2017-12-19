@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(extrinsic_calibration)
 
-find_package(Boost REQUIRED COMPONENTS system)
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
 
@@ -14,7 +13,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}")
 
 include_directories(
   INCLUDE include
-  ${Boost_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
 )
