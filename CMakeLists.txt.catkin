@@ -1,0 +1,74 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(extrinsic_calibration)
+
+set(LIBS ${catkin_LIBRARIES} ${Boost_LIBRARIES} ${PCL_LIBRARIES})
+
+add_definitions(-std=c++11)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  std_msgs
+  tf
+  interactive_markers
+  rosbag
+  message_generation
+  image_geometry
+  image_transport
+  geometry_msgs
+  dynamic_reconfigure
+)
+find_package(Boost REQUIRED COMPONENTS system)
+find_package(PCL REQUIRED)
+find_package(OpenCV 3 REQUIRED)
+
+catkin_package(
+  DEPENDS geometry_msgs
+  CATKIN_DEPENDS message_runtime dynamic_reconfigure
+)
+
+
+###########
+## Build ##
+###########
+
+include_directories(
+  INCLUDE include
+  ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
+)
+
+add_executable(
+  calibrator 
+  src/calibrator.cpp
+  src/marker_detector.cpp
+  src/calibrator_node.cpp
+)
+target_link_libraries(
+  calibrator
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
+  ${Boost_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
+add_executable(calibrator_pcl 
+  test/calibrator_pcl.cpp
+  src/calibrator.cpp
+  src/marker_detector.cpp
+)
+target_link_libraries(
+  calibrator_pcl
+  ${OpenCV_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
+#add_executable(
+#  laser_marker
+#  src/laser_marker.cpp
+#)
+#target_link_libraries(
+#  laser_marker
+#  ${catkin_LIBRARIES}
+#  ${Boost_LIBRARIES}
+#)
+
