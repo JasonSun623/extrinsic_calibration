@@ -17,7 +17,7 @@ This only works with RGBD cameras (must be intrisically calibrated first!). All 
 
 4) Build the executable 'test/calibration_pcl.cpp'
 
-5) Run 'calibration_pcl <pcd1> <pcd2>' (this example only works with 2 pcd files, but you can easily add more in the code).
+5) Run 'calibration_pcl pcdfile1 pcdfile2' (this example only works with 2 pcd files, but you can easily add more in the code).
 
 Outputs WorldR and WorldT points for each pcd file. This is the transformation matrix between the camera and world space.
 
