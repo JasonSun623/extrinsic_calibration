@@ -102,8 +102,8 @@ void calib_test(pcl::PointCloud<PointT>::Ptr cloud, pcl::PointCloud<PointT>::Ptr
 
 int main(int argc, char **argv)
 {
-    std::string pcd_file_1 = "/home/vincent/catkin_ws2/src/extrinsic_calibration/data/1511494760.pcd";
-    std::string pcd_file_2 = "/home/vincent/catkin_ws2/src/extrinsic_calibration/data/1511494760.pcd";
+    std::string pcd_file_1 = "../data/1.pcd";
+    std::string pcd_file_2 = "../data/2.pcd";
 
     if (argc > 1)
     {
