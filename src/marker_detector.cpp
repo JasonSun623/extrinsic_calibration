@@ -55,23 +55,23 @@ bool MarkerDetector::findMarkers(cv::Mat& img, MarkerInfo& marker)
   std::vector<MarkerInfo> markers;
   cv::Mat img2, img3;
 
-  cv::imshow("image", img);
-  cv::waitKey(0);
-  PRINT("cvtColor")
+  // cv::imshow("image", img);
+  // cv::waitKey(0);
+  // PRINT("cvtColor")
 
   cv::cvtColor(img, img2, CV_BGR2GRAY);
 
-  PRINT("findMakers 1")
+  // PRINT("findMakers 1")
 
   cv::threshold(img2, img2, nThreshold, 255, CV_THRESH_BINARY);
   img2.copyTo(img3);
 
-  PRINT("findMakers 2")
+  // PRINT("findMakers 2")
 
   std::vector<std::vector<cv::Point>> contours; 
   cv::findContours(img3, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_NONE);
 
-  PRINT("findMakers 3")
+  // PRINT("findMakers 3")
 
   for (unsigned int i = 0; i < contours.size(); i++)
   {
@@ -143,7 +143,7 @@ bool MarkerDetector::findMarkers(cv::Mat& img, MarkerInfo& marker)
         cv::Point2f pt2 = cv::Point2f(marker.corners[(j + 1) % nMarkerCorners].x, marker.corners[(j + 1) % nMarkerCorners].y);
         cv::line(img, pt1, pt2, cv::Scalar(0, 255, 0), 2);
       }
-      cv::imshow("aa",img);
+      // cv::imshow("aa",img);
     }
     return true;
   }
