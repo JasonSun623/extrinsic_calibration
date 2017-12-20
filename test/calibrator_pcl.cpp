@@ -2,6 +2,8 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/visualization/cloud_viewer.h>
+
 
 #include "extrinsic_calibration/calibrator.h"
 #include "extrinsic_calibration/cvutils.h"
@@ -136,7 +138,12 @@ int main(int argc, char **argv)
     *merged_cloud += *out_cloud1;
     *merged_cloud += *out_cloud2;
 
-
+    pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("Merged cloud"));
+    viewer->addPointCloud (merged_cloud, "mergedcloud");
+    while (!viewer->wasStopped ())
+    {
+        viewer->spinOnce (100);
+    }
 
     return 0;
 }
