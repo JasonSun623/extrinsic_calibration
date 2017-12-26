@@ -75,17 +75,22 @@ void calib_test(pcl::PointCloud<PointT>::Ptr cloud, pcl::PointCloud<PointT>::Ptr
         return;
     }
 
+    const auto& T = calibrator.worldT;
+    const auto& R = calibrator.worldR;
+
     std::vector<int> good_indices = filterCloudNan(*cloud, *out_cloud);
 #pragma omp parallel for
     for (unsigned int i = 0; i < out_cloud->points.size(); i++)
     {
-        PointT &pt = out_cloud->points[i];
-        pt.x += calibrator.worldT[0];
-        pt.y += calibrator.worldT[1];
-        pt.z += calibrator.worldT[2];
+        PointT& pt = out_cloud->points[i];
+        pt.x += T[0];
+        pt.y += T[1];
+        pt.z += T[2];
 
-        pt = CvUtils::RotatePoint<PointT>(pt, calibrator.worldR);
-        PointT &pt_ori = cloud->points[good_indices[i]];
+        pt = CvUtils::RotatePoint<PointT>(pt, R);
+
+        const PointT &pt_ori = cloud->points[good_indices[i]];
+
         pt.r = pt_ori.r;
         pt.g = pt_ori.g;
         pt.b = pt_ori.b;

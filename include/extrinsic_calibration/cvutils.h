@@ -35,9 +35,9 @@ public:
   static PointT RotatePoint(const PointT &point, const std::vector<std::vector<float>> &R)
   {
     PointT res;
-    res.x = point.x * R[0][0] + point.y * R[1][0] + point.z * R[2][0];
-    res.y = point.x * R[0][1] + point.y * R[1][1] + point.z * R[2][1];
-    res.z = point.x * R[0][2] + point.y * R[1][2] + point.z * R[2][2];
+    res.x = point.x * R[0][0] + point.y * R[0][1] + point.z * R[0][2];
+    res.y = point.x * R[1][0] + point.y * R[1][1] + point.z * R[1][2];
+    res.z = point.x * R[2][0] + point.y * R[2][1] + point.z * R[2][2];
     return res;
   }
 
