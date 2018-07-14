@@ -12,8 +12,8 @@ One-shot calibration at its best ;)
 ### HOW TO
 This only works with RGBD cameras (must be intrisically calibrated first!). All the cameras have to see the full calibration board. 
 
-1) Print out the calibration board in "etc/calib_marker.gif". Recommended size for the board is A3 if the cameras are far away (3+ meters), A4 otherwise
-<img src="etc/calib_marker.gif" height="300">
+1) Print out the calibration board in "etc/calib_marker.gif". Recommended size for the board is A3 if the cameras are far away (3+ meters), A4 otherwise  
+<img src="etc/calib_marker.gif" height="100">
 
 2) Place the calibration board in view of all the cameras. Make sure that you can see the full calibration board in each camera pointcloud. Note that this will not work if there are holes along the edges of the calibration board pointcloud. ALSO, make sure that lights are not shining strongly on the calibration pattern, since the program uses a threshold to separate light-colored areas from dark ones.
 
