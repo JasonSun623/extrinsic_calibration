@@ -119,9 +119,12 @@ public:
   ~MarkerDetector()
   {}
   
-  bool bDraw;
+  bool bDraw = false;
   bool findMarkers(const std::vector<PointRGB>& img, int height, int width, MarkerInfo &marker);
-
+  inline void setBinaryThreshold(int thresh)
+  {
+    nThreshold = thresh;
+  }
 private:
   //image processing parameters
   int nMarkerCorners;

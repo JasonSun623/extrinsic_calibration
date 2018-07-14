@@ -43,7 +43,7 @@ Calibrator::~Calibrator()
 bool Calibrator::calibrate(const std::vector<PointRGB>& pBuffer,
   const std::vector<Point3f>& pCameraCoordinates,
   int cColorWidth, 
-  int cColorHeight)
+  int cColorHeight, bool visualize)
 {
   LOGF(INFO, "enter calibrate function.");
   if (pCameraCoordinates.size() == 0)
@@ -52,6 +52,7 @@ bool Calibrator::calibrate(const std::vector<PointRGB>& pBuffer,
     return false;
   }
   MarkerInfo marker;
+  pDetector->bDraw = visualize;
   bool res = pDetector->findMarkers(pBuffer, cColorHeight, cColorWidth, marker);  // this only changes marker.corners. you can view the markers with bDraw=True
 
   if (!res)

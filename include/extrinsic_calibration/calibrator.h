@@ -39,7 +39,7 @@ public:
   bool calibrate(const std::vector<PointRGB>& pBuffer,
     const std::vector<Point3f>& pCameraCoordinates,
     int cColorWidth, 
-    int cColorHeight);
+    int cColorHeight, bool visualize=false);
 
 private:
   std::unique_ptr<MarkerDetector> pDetector;

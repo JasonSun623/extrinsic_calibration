@@ -17,13 +17,16 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(calibrator_pcl 
-  test/calibrator_pcl.cpp
+add_executable(calibration_test 
+  test/calibration_test.cpp
   src/calibrator.cpp
   src/marker_detector.cpp
 )
 target_link_libraries(
-  calibrator_pcl
+  calibration_test
   ${OpenCV_LIBRARIES}
   ${PCL_LIBRARIES}
 )
+
+#add_executable(to_transform_matrix test/to_transform_matrix.cpp)
+#target_link_libraries(to_transform_matrix ${PCL_LIBRARIES})

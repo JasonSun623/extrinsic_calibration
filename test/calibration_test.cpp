@@ -11,10 +11,10 @@
 using namespace extrinsic_calibration;
 using namespace std;
 
-#define KINECT_COLOR_HEIGHT 540
-#define KINECT_COLOR_WIDTH 960
+#define KINECT_COLOR_HEIGHT 424
+#define KINECT_COLOR_WIDTH 512
 
-const int N_REQUIRED_SAMPLES = 1;
+#define PRINT(a) std::cout << #a << ": " << a << std::endl;
 
 typedef pcl::PointXYZRGB PointT;
 
@@ -38,18 +38,17 @@ std::vector<int> filterCloudNan(pcl::PointCloud<PointT> &cloud, pcl::PointCloud<
     return good_indices;
 }
 
-void calib_test(pcl::PointCloud<PointT>::Ptr cloud, pcl::PointCloud<PointT>::Ptr out_cloud)
+bool find_pattern_and_transform(pcl::PointCloud<PointT>::Ptr cloud, pcl::PointCloud<PointT>::Ptr out_cloud)
 {
     // calibration
     Calibrator calibrator;
-    calibrator.nRequiredSamples = N_REQUIRED_SAMPLES;
+    calibrator.nRequiredSamples = 1;
 
     // init marker poses
     MarkerPose m_pose;
     m_pose.markerId = 0; // we are using calibration board marker 0 -> 0.gif
     calibrator.markerPoses.push_back(m_pose);
 
-    std::vector<float> m_vBounds{-0.5, -0.5, -0.5, 0.5, 0.5, 0.5};
     // point3f buffer
     vector<Point3f> pCameraCoordinates;
     vector<PointRGB> color;
@@ -64,15 +63,15 @@ void calib_test(pcl::PointCloud<PointT>::Ptr cloud, pcl::PointCloud<PointT>::Ptr
         color.push_back(PointRGB(cloud_pt.r, cloud_pt.g, cloud_pt.b));
     }
 
-    bool res = calibrator.calibrate(color, pCameraCoordinates, KINECT_COLOR_WIDTH, KINECT_COLOR_HEIGHT);
+    bool res = calibrator.calibrate(color, pCameraCoordinates, KINECT_COLOR_WIDTH, KINECT_COLOR_HEIGHT, true);
     if (res)
     {
         LOGF(DBUG, "calibrate success.");
     }
     else
     {
-        LOGF(WARN, "calibrate FAIL.");
-        return;
+        LOGF(WARN, "calibrate FAIL. Could not detect the full pattern in the cloud");
+        return false;
     }
 
     const auto& T = calibrator.worldT;
@@ -96,59 +95,90 @@ void calib_test(pcl::PointCloud<PointT>::Ptr cloud, pcl::PointCloud<PointT>::Ptr
         pt.b = pt_ori.b;
     }
 
-    // pcl::toPCLPointCloud2(*out_cloud, cloud2_pcl);
-    // pcl_conversions::moveFromPCL(cloud2_pcl, final_pc2_msg_);
-
-    // final_pc2_msg_.header.seq = 0;
-    // final_pc2_msg_.header.stamp = ros::Time::now();
-    // final_pc2_msg_.header.frame_id = cloud_msg->header.frame_id;
-    // final_cloud_pub_.publish(final_pc2_msg_);
-
+    return true;
 }
 
 int main(int argc, char **argv)
 {
-    std::string pcd_file_1 = "../data/1.pcd";
-    std::string pcd_file_2 = "../data/2.pcd";
+    std::string pcd_file_1;// = "../data/1.pcd";
+    std::string pcd_file_2;// = "../data/2.pcd";
 
-    if (argc > 1)
+    if (argc != 3)
     {
-        pcd_file_1 = argv[1];
+        printf("Usage: %s pcd_file_1 pcd_file_2\n", argv[0]);
+        return -1;
     }
-    if (argc > 2)
-    {
-        pcd_file_2 = argv[2];
-    }
+
+    pcd_file_1 = argv[1];
+    pcd_file_2 = argv[2];
 
     //
     pcl::PointCloud<PointT>::Ptr cloud1(new pcl::PointCloud<PointT>);
     pcl::PointCloud<PointT>::Ptr out_cloud1(new pcl::PointCloud<PointT>);
     pcl::PointCloud<PointT>::Ptr cloud2(new pcl::PointCloud<PointT>);
     pcl::PointCloud<PointT>::Ptr out_cloud2(new pcl::PointCloud<PointT>);
+
+    const size_t CLOUD_SIZE = KINECT_COLOR_HEIGHT * KINECT_COLOR_WIDTH;
     if(pcl::io::loadPCDFile(pcd_file_1, *cloud1) == -1)
     {
         std::cerr << "Couldn't read pcd file! " << pcd_file_1 << "\n";
         return -1;
+    } else {
+        if (cloud1->size() != CLOUD_SIZE)
+        {
+            printf("%s cloud size of %d does not match [%d x %d]\n", pcd_file_1.c_str(), cloud1->size(), KINECT_COLOR_HEIGHT, KINECT_COLOR_WIDTH);
+            return -1;
+        }
     }
     if(pcl::io::loadPCDFile(pcd_file_2, *cloud2) == -1)
     {
         std::cerr << "Couldn't read pcd file! " << pcd_file_2 << "\n";
         return -1;
+    } else {
+        if (cloud2->size() != CLOUD_SIZE)
+        {
+            printf("%s cloud size of %d does not match [%d x %d]\n", pcd_file_2.c_str(), cloud2->size(), KINECT_COLOR_HEIGHT, KINECT_COLOR_WIDTH);
+            return -1;
+        }
     }
-    calib_test(cloud1, out_cloud1);
 
-    calib_test(cloud2, out_cloud2);
 
     pcl::PointCloud<PointT>::Ptr merged_cloud(new pcl::PointCloud<PointT>);
+    *merged_cloud += *cloud1;
+    *merged_cloud += *cloud2;
+
+    pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("Merged cloud"));
+    viewer->addCoordinateSystem();
+    viewer->addPointCloud (merged_cloud, "mergedcloud");
+    std::cout << "Showing initial clouds" << std::endl;
+    viewer->spin();
+    
+    if (!find_pattern_and_transform(cloud1, out_cloud1))
+    {
+        return -1;
+    }
+    if (!find_pattern_and_transform(cloud2, out_cloud2))
+    {
+        return -1;
+    }
+
+    merged_cloud->clear();
     *merged_cloud += *out_cloud1;
     *merged_cloud += *out_cloud2;
 
-    pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("Merged cloud"));
+    viewer->removeAllPointClouds();
     viewer->addPointCloud (merged_cloud, "mergedcloud");
-    while (!viewer->wasStopped ())
-    {
-        viewer->spinOnce (100);
-    }
+    std::cout << "Showing final aligned clouds" << std::endl;
+    viewer->spin();
+
+    // std::string save_file = "../data/v1.pcd";
+    // pcl::io::savePCDFileBinary(save_file, *out_cloud1);
+    // printf("Saved to %s\n", save_file.c_str());
+
+    // save_file = "../data/v2.pcd";
+    // pcl::io::savePCDFileBinary(save_file, *out_cloud2);
+    // printf("Saved to %s\n", save_file.c_str());
+
 
     return 0;
 }
